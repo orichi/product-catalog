@@ -403,3 +403,72 @@ Finished in 0.35467 seconds (files took 1.77 seconds to load)
 5 examples, 0 failures
    
 ```   
+
+
+## mina+puma  部署
+
+添加
+
+```
+gem mina
+gem puma
+gem 'mina-puma'
+```
+
+服务器组件
+
+```
+rvm 
+ruby 
+libxslt-dev libxml2-dev
+nginx
+nodejs
+mongodb
+# 等等，视项目情况而定
+```
+
+```
+ssh-copy-id -i .ssh/id_ras.pub user@ip
+```
+
+### mina部署步骤
+mina setup
+
+mina deploy
+
+mina puma:[start|restart|stop]
+
+nginx server 配置
+
+```
+# /etc/nginx/sites-enabled/product_i
+
+  upstream deploy {
+    server unix:///var/www/product/shared/tmp/sockets/product.sock;
+  }
+
+  server {
+      listen 80;
+      server_name product.i; # change to match your URL
+      root /var/www/product/current/public; # I assume your app is located at this location
+
+      location / {
+          proxy_pass http://deploy; # match the name of upstream directive which is defined above
+          proxy_set_header Host $host;
+          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+      }
+
+      location ~* ^/assets/ {
+          # Per RFC2616 - 1 year maximum expiry
+          expires 1y;
+          add_header Cache-Control public;
+                  # Some browsers still send conditional-GET requests if there's a
+          # Last-Modified header or an ETag header even if they haven't
+          # reached the expiry date sent in the Expires header.
+          add_header Last-Modified "";
+          add_header ETag "";
+          break;
+      }
+}
+
+```
