@@ -472,3 +472,50 @@ nginx server 配置
 }
 
 ```
+
+
+## puma service
+sudo vi /etc/systemd/system/puma.service
+
+```
+[Unit]
+Description=Puma HTTP Server
+After=network.target
+
+[Service]
+Type=simple
+User=deploy
+
+WorkingDirectory=/path/to/app
+# ExecStart=/home/deploy/.rbenv/shims/bundle exec puma -e production -C /path/to/app/config/puma.rb /path/to/app/config.ru
+ExecStart=/bin/bash -lc 'bundle exec puma -e production -C /path/to/app/config/puma.rb /path/to/app/config.ru'
+PIDFile=/path/to/app/tmp/pids/puma.pid
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+```
+
+* `/path/to/app` 需要视需要，替换成相应的目录 app目录为current，配置文件目录为shared
+* User 角色视情况修改
+* /bin/bash -lc 'command' 获取rvm内的bundle环境
+
+```
+# After installing or making changes to puma.service
+sudo systemctl daemon-reload
+
+# Enable so it starts on boot
+sudo systemctl enable puma.service
+
+# Initial start up.
+sudo systemctl start puma.service
+
+# Check status
+sudo systemctl status puma.service
+
+```
+
+`sudo systemctl restart puma.service`
+
+这样项目在machine boot的时候就可以自动start了
+
