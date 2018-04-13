@@ -32,7 +32,8 @@ gem 'sdoc', '~> 0.4.0', group: :doc
 # add gems
 gem 'mongoid'
 gem 'bson_ext'
-
+gem 'puma'
+gem 'mina'
 # end add gems
 
 
