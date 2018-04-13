@@ -34,6 +34,7 @@ gem 'mongoid'
 gem 'bson_ext'
 gem 'puma'
 gem 'mina'
+gem 'mina-puma', :require => false
 # end add gems
 
 
